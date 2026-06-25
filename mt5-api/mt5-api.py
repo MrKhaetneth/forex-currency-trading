@@ -1,5 +1,3 @@
-print("Hey, this file is for MT5 API!")
-
 import pandas as pd
 from pymt5linux import MetaTrader5
 
