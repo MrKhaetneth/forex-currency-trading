@@ -8,7 +8,7 @@ import statsmodels.api as sm
 # 1. Download Real 1-Minute FX Data
 print("Fetching real 1-minute EUR/USD data...")
 # Switch to a centralized asset that registers real volume per minute
-ticker = "SPY" 
+ticker = "SPY"
 data = yf.download(tickers=ticker, period="5d", interval="1m") # 5 days of 1-minute data for SPY as a proxy for FX volume analysis
 
 if data.empty:
@@ -22,8 +22,10 @@ if isinstance(data.columns, pd.MultiIndex):
 df = data[['Close', 'Volume']].dropna().copy()
 
 # 2. Generate Standard Time Bar Returns
+#negative when price goes down, positive when price goes up, zero when price is unchanged
+# Why? Why is this parameter important and what does it imply?
 df['Time_Log_Returns'] = np.log(df['Close'] / df['Close'].shift(1))
-time_returns = df['Time_Log_Returns'].dropna().to_numpy() #negative when price goes down, positive when price goes up, zero when price is unchanged
+time_returns = df['Time_Log_Returns'].dropna().to_numpy() 
 
 # 3. Construct Custom Volume Bars
 # We define a volume threshold based on the average volume per minute
