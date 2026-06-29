@@ -3,12 +3,13 @@ name = "forex-currency-trading"
 version = "0.1.0"
 requires-python = ">=3.13"
 dependencies = [
+    "ccxt>=4.5.61",
     "h5py>=3.16.0",
     "jupyter>=1.1.1",
     "matplotlib>=3.11.0",
+    "metatrader5>=5.0.5735 ; sys_platform == 'win32'",
     "numpy>=2.5.0",
     "pandas>=3.0.3",
-    "pymt5linux>=1.0",
     "scipy>=1.18.0",
     "statsmodels>=0.14.6",
     "yfinance>=1.4.1",
