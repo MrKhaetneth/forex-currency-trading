@@ -55,8 +55,8 @@ volume_returns_std = (volume_returns - np.mean(volume_returns)) / np.std(volume_
 print("\n" + "="*40)
 print("             STATISTICAL METRICS")
 print("="*40)
-print(f"Time Bars Excess Kurtosis   : {stats.kurtosis(time_returns):.4f}")
-print(f"Volume Bars Excess Kurtosis : {stats.kurtosis(volume_returns):.4f}")
+print(f"Time Bars Excess Kurtosis   : {stats.kurtosis(time_returns, fisher=True):.4f}") # fisher=True gives excess kurtosis (subtracts 3)
+print(f"Volume Bars Excess Kurtosis : {stats.kurtosis(volume_returns, fisher=True):.4f}")
 print("-"*40)
 print(f"Time Bars Jarque-Bera Stat  : {stats.jarque_bera(time_returns)[0]:.2f}")
 print(f"Volume Bars Jarque-Bera Stat: {stats.jarque_bera(volume_returns)[0]:.2f}")
@@ -92,6 +92,19 @@ axes[1, 0].grid(True, alpha=0.3)
 sm.qqplot(volume_returns_std, line='45', ax=axes[1, 1], fmt='.', color='teal', alpha=0.5)
 axes[1, 1].set_title("Q-Q Plot: Transformed Volume Bars")
 axes[1, 1].grid(True, alpha=0.3)
+
+# Align x and y axes for Q-Q plots to enable direct visual comparison
+qq_xlim = (
+    min(axes[1, 0].get_xlim()[0], axes[1, 1].get_xlim()[0]),
+    max(axes[1, 0].get_xlim()[1], axes[1, 1].get_xlim()[1])
+)
+qq_ylim = (
+    min(axes[1, 0].get_ylim()[0], axes[1, 1].get_ylim()[0]),
+    max(axes[1, 0].get_ylim()[1], axes[1, 1].get_ylim()[1])
+)
+for ax in [axes[1, 0], axes[1, 1]]:
+    ax.set_xlim(qq_xlim)
+    ax.set_ylim(qq_ylim)
 
 plt.tight_layout()
 plt.savefig("stock_returns_comparison.png", dpi=300)
