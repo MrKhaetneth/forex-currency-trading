@@ -1,1 +1,3 @@
+# Log
+
 **Notes from MrKhaetneth on 24 July 2026 19:10 GMT+7.:** I will not be using `MetaTrader5` because it is too tedious to work on WindowOS. `pymt5linux` is a bridge between my WindowOS and LinuxOS, but it's too tedious to set up the proper environment for the architectural bridge between these two OS's. So, I will find an alternative. The `mt5-api.py` file is written by Claude Opus 4.8. It might be salvagable if I can fix whatever is wrong with my Python Interpreter on my WindowOS. But until then, I'm not touching it.
