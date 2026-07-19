@@ -2,3 +2,4 @@
 
 # Secret Information!
 keys.env
+*.h5

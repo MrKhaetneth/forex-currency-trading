@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 
 load_dotenv(dotenv_path = Path("keys.env"))
-mt5_acc = {"account": int(os.getenv("mt5_account")),
+mt5_cred = {"account": int(os.getenv("mt5_account")),
             "password": os.getenv("mt5_password"),
             "investor": os.getenv("mt5_investor"),
             "server": os.getenv("mt5_server")}
@@ -15,9 +15,9 @@ def main():
         print("Initialization failed, error code = ", mt5.last_error())
         quit()
     
-    authorized = mt5.login(mt5_acc["account"], password = mt5_acc["password"], server = "HantecMarketsMU-MT5")
+    authorized = mt5.login(mt5_cred["account"], password = mt5_cred["password"], server = mt5_cred["server"])
     if authorized:
-        print("connected to account #{}".format(mt5_acc["account"]))
+        print("connected to account #{}".format(mt5_cred["account"]))
         
         print("===== MetaTrader5 Account Details =====")
         # display trading account info as is 
@@ -27,7 +27,7 @@ def main():
         for prop in account_info_dict:
             print("  {}={}".format(prop, account_info_dict[prop]))
     else:
-        print("failed to connect at account #{}, error code: {}".format(mt5_acc["account"], mt5.last_error()))
+        print("failed to connect at account #{}, error code: {}".format(mt5_cred["account"], mt5.last_error()))
         quit()
     
     # display data on connection status, server name and trading account
@@ -37,8 +37,7 @@ def main():
     
     mt5.shutdown()
 
-if __name__ != "__main__":
-    print(f"Importing {__name__}...")
-
 if __name__ == "__main__":
     main()
+else:
+    print(f"Importing {__name__}...")

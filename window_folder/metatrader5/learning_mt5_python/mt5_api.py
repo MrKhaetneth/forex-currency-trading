@@ -40,8 +40,7 @@ def main():
     mt5.shutdown()
 
 
-if __name__ != "__main__":
-    print(f"Importing {__name__}...")
-
 if __name__ == "__main__":
-    main() 
+    main()
+else:
+    print(f"Importing {__name__}...")
