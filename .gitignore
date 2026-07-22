@@ -1,5 +1,14 @@
+# Virtual environment
 /.venv
 
 # Secret Information!
-keys.env
+*.env
+
+# Databases
 *.h5
+
+# Testing environments
+testing_area/
+
+# caches
+**/__pycache__/

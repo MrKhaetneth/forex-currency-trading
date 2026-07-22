@@ -12,6 +12,7 @@ import h5py
 from datetime import datetime
 from check_env import check_status
 
+# Contants
 SYMBOL = "EURUSD"
 TIMEZONE = pytz.timezone("Etc/UTC")
 UTC_FROM = datetime(2020, 1, 1, tzinfo = TIMEZONE)
