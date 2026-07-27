@@ -1,3 +1,5 @@
+# This script is OBSOLETE
+
 import sys
 from pathlib import Path
 

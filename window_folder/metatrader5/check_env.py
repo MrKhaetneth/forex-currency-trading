@@ -1,33 +1,43 @@
-import MetaTrader5 as mt5
+# -------- IMPORTS ----------
 import os 
+import MetaTrader5 as mt5
 
 from dotenv import load_dotenv
 from pathlib import Path
 
-load_dotenv(dotenv_path = Path("keys.env"))
-mt5_cred = {"account": int(os.getenv("mt5_account")),
+# -------- CONSTANTS ----------
+ENV_PATH = Path(__file__).resolve().parent.parent.parent / "keys.env"
+load_dotenv(dotenv_path = ENV_PATH)
+
+MT5_CRED = {"account": int(os.getenv("mt5_account")),
             "password": os.getenv("mt5_password"),
             "investor": os.getenv("mt5_investor"),
             "server": os.getenv("mt5_server")}
 
+# -------- FUNCTIONS ----------
 def check_status():
-    print("Checking credentials...\n")
+    print("<NOTICE> Attempting to connect to MetaTrader5...")
     if not mt5.initialize():
-        print("Initialization failed, error code = ", mt5.last_error(), "\n")
+        print("<NOTICE> Initialization failed. Error code = ", mt5.last_error())
+        print("\n<TERM> Session terminated.")
         mt5.shutdown()
         return False
     
-    authorized = mt5.login(mt5_cred["account"], password = mt5_cred["password"], server = mt5_cred["server"])
+    print("<NOTICE> Checking credentials...")
+    authorized = mt5.login(MT5_CRED["account"], password = MT5_CRED["password"], server = MT5_CRED["server"])
     if authorized:
-        print("connected to account #{} on server {}\n".format(mt5_cred["account"], mt5_cred["server"]))
+        print("<NOTICE> Connected to account #{} on server {}".format(MT5_CRED["account"], MT5_CRED["server"]))
     else:
-        print("failed to connect at account #{}, error code: {}\n".format(mt5_cred["account"], mt5.last_error()))
+        print("<NOTICE> Failed to connect to account #{}. Error code: {}".format(MT5_CRED["account"], mt5.last_error()))
+        print("\n<TERM> Session terminated.")
         mt5.shutdown()
         return False 
     
     return True
-    
+
+# -------- SYSTEM CALLING ----------
 if __name__ != "__main__":
     print(f"Importing {__file__}...")
+
 else:
     print("Why are you running this file?")

@@ -23,6 +23,7 @@ def main():
         quit()
     
     rates = mt5.copy_rates_range(SYMBOL, mt5.TIMEFRAME_D1, UTC_FROM, UTC_TO)
+    print(type(rates))
     
     mt5.shutdown()
     
