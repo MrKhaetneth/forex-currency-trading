@@ -1,0 +1,44 @@
+{
+    "symbol": "EURUSD",
+    "garch_estimation": {
+        "status": "optimization_failed_fallback_used",
+        "fallback_method": "Rolling Volatility (window=20)"
+    },
+    "comparison_metrics": {
+        "Time Bars": {
+            "observations": 19999,
+            "skewness": 6.772657446021274,
+            "excess_kurtosis": 298.27876395611344,
+            "jb_statistic": 74291032.41490191,
+            "jb_p_value": 0.0
+        },
+        "Volume Bars": {
+            "observations": 1854,
+            "skewness": 2.393403626253943,
+            "excess_kurtosis": 32.74100097089815,
+            "jb_statistic": 84579.99512223645,
+            "jb_p_value": 0.0
+        },
+        "Dollar Bars": {
+            "observations": 1854,
+            "skewness": 2.3782563670197034,
+            "excess_kurtosis": 32.105916360416686,
+            "jb_statistic": 81376.25303198141,
+            "jb_p_value": 0.0
+        },
+        "Rolling Vol-Std Time": {
+            "observations": 19980,
+            "skewness": -0.022243383144244917,
+            "excess_kurtosis": 0.7353365459686771,
+            "jb_statistic": 451.7968410864494,
+            "jb_p_value": 7.82640805356343e-99
+        },
+        "Vol-Std Volume Bars": {
+            "observations": 1835,
+            "skewness": 0.07092894157861684,
+            "excess_kurtosis": 0.46552228990614397,
+            "jb_statistic": 18.107983487226093,
+            "jb_p_value": 0.00011692337600946806
+        }
+    }
+}
