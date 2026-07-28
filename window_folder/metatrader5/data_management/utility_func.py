@@ -1,23 +1,20 @@
 # -------- IMPORTS ----------
 import MetaTrader5 as mt5
 import pandas as pd
-import numpy as np
 import subprocess
-import h5py
 import pytz
+import csv
 import sys
 
 from datetime import datetime
 from pathlib import Path
 
-parent_dir = Path(__file__).resolve().parent.parent 
+parent_dir = Path(__file__).resolve().parent.parent
 sys.path.append(str(parent_dir))
 from check_env import check_status
-del parent_dir 
+del parent_dir
 
 # -------- CONSTANTS ----------
-# For HDF5 input
-STRING_DATATYPE = h5py.string_dtype(encoding = "utf-8")
 TIMEZONE = pytz.timezone("Etc/UTC")
 
 # -------- FUNCTIONS ----------
@@ -35,54 +32,85 @@ def get_local_git_username() -> str:
     except (subprocess.CalledProcessError, FileNotFoundError):
         return "Unknown"
 
+_LOG_COLUMNS = ["LOG_TIME", "ACTION", "BY", "SYMBOL", "TIMEFRAME", "TCST", "TCET"]
+
+def log_csv_path(HDF5_PATH: Path) -> Path:
+    """Return the change-log CSV path that sits alongside a given HDF5 file (same folder, "<stem>_change_log.csv").
+
+    Args:
+        HDF5_PATH (Path): Location (as a Path object) of the HDF5 file.
+
+    Returns:
+        Path: Location of that file's change-log CSV.
+    """
+    return HDF5_PATH.with_name(f"{HDF5_PATH.stem}_change_log.csv")
+
+def _append_log_row(HDF5_PATH: Path, row: list):
+    """Append a single row to the change-log CSV, writing the header first if the file is new.
+
+    Args:
+        HDF5_PATH (Path): Location (as a Path object) of the HDF5 file the log belongs to.
+        row (list): Values matching the order of _LOG_COLUMNS.
+    """
+    csv_path = log_csv_path(HDF5_PATH)
+    csv_path.parent.mkdir(parents = True, exist_ok = True)
+    is_new_file = not csv_path.exists()
+
+    with open(csv_path, mode = "a", newline = "", encoding = "utf-8") as f:
+        csv_writer = csv.writer(f)
+        if is_new_file:
+            csv_writer.writerow(_LOG_COLUMNS)
+        csv_writer.writerow(row)
+
 def change_log(FILENAME: str, HDF5_PATH: Path, log_mode: str, log_description: dict = {}):
-    """Add change log into HDF5 file. There will be 6 colums: ["LOG_TIME", "ACTION", "BY", "AT", "SYMBOL_TCST", "SYMBOL_TCET"].
+    """Record an entry into the CSV change log kept alongside the HDF5 file (see log_csv_path).
+
+    Kept as a plain CSV (rather than inside the HDF5 file) so non-technical collaborators can
+    open it directly in Excel/Notepad without needing h5py/pandas, and so it diffs cleanly in git.
+
+    There are 7 columns (see _LOG_COLUMNS): ["LOG_TIME", "ACTION", "BY", "SYMBOL", "TIMEFRAME", "TCST", "TCET"].
         - LOG_TIME: The time at which the log was recorded.
-        - ACTION: What you did.
-        - BY: Who you are.
-        - AT: Where did the action took place? (If you update the table of a symbol, this column will also record which symbol you updated.)
-        - SYMBOL_TCST: The starting time of the downloaded table of a symbol's pricing history (before merging). (Table Change Starting Time)
-        - SYMBOL_TCET: The ending time of the downloaded table of a symbol's pricing history (before merging). (Table Change Ending Time)
+        - ACTION: What was done ("File Creation", "Add Data", "Remove Dataset").
+        - BY: The local git username of whoever performed the action.
+        - SYMBOL: The symbol affected by the action (blank for "File Creation").
+        - TIMEFRAME: The HDF5 timeframe group affected, e.g. "D1" (blank for "File Creation").
+        - TCST: For "Add Data", the starting time of the newly downloaded table (before merging). (Table Change Starting Time)
+        - TCET: For "Add Data", the ending time of the newly downloaded table (before merging). (Table Change Ending Time)
 
     Args:
         FILENAME (str): The name of the HDF5 file.
         HDF5_PATH (Path): Location (as a Path object) of the HDF5 file.
-        log_mode (str): Mode of writing the change log.
-        log_description (dict): Additional description about this change log.
+        log_mode (str): One of "create", "append", "delete"/"remove".
+        log_description (dict): For "append": {"SYMBOL", "TIMEFRAME", "TIME_START", "TIME_END"}.
+            For "delete"/"remove": {"SYMBOL", "TIMEFRAME"}. Unused for "create".
     """
     log_mode = log_mode.strip().lower()
-    writer = get_local_git_username()
+    writer_name = get_local_git_username()
+    log_time = datetime.now().replace(microsecond = 0).strftime("%Y-%m-%d %H:%M:%S")
+
     match log_mode:
         case "create":
-            with h5py.File(HDF5_PATH, mode = "a") as logfile:
-                if "change_log" in logfile:
-                    del logfile["change_log"]
-                dummy_header = np.zeros((0, 6), dtype = object)
-                log_data = logfile.create_dataset(
-                    "change_log",
-                    data = dummy_header,
-                    maxshape = (None, 6),
-                    chunks = True,
-                    dtype = STRING_DATATYPE
-                )
-                log_time = datetime.now().replace(microsecond = 0).strftime("%Y-%m-%d %H:%M:%S")
-                action = "Create File"
-                by = writer
-                at = f"dataset/{FILENAME}"
-                symbol_tcst = ""
-                symbol_tcet = ""
-                
-                initial_row = np.array([[log_time, action, by, at, symbol_tcst, symbol_tcet]], dtype = object)
-                log_data.resize(log_data.shape[0] + initial_row.shape[0], axis = 0) # Add another row to the table for substitution
-                log_data[-1:] = initial_row
-            
-            print(f"\n<{FILENAME}-LOG> Log file initialized. You may view change logs at dataset \"change_log\" within {FILENAME}.")
+            _append_log_row(HDF5_PATH, [log_time, "File Creation", writer_name, "", "", "", ""])
+            print(f"\n<{FILENAME}-LOG> Log initialized at {log_csv_path(HDF5_PATH).name}.")
 
         case "append":
-            pass
-        
+            symbol = log_description.get("SYMBOL", "")
+            timeframe = log_description.get("TIMEFRAME", "")
+            tcst = str(log_description.get("TIME_START", ""))
+            tcet = str(log_description.get("TIME_END", ""))
+
+            _append_log_row(HDF5_PATH, [log_time, "Add Data", writer_name, symbol, timeframe, tcst, tcet])
+            print(f"<{FILENAME}-LOG> Logged data addition for {symbol} ({timeframe}).")
+
         case "delete" | "remove":
-            pass 
+            symbol = log_description.get("SYMBOL", "")
+            timeframe = log_description.get("TIMEFRAME", "")
+
+            _append_log_row(HDF5_PATH, [log_time, "Remove Dataset", writer_name, symbol, timeframe, "", ""])
+            print(f"<{FILENAME}-LOG> Logged dataset removal for {symbol} ({timeframe}).")
+
+        case _:
+            raise ValueError(f"<ERROR> Unrecognized log_mode: '{log_mode}'.")
 
 def parse_datetime(time_input: str) -> datetime:
     """Check the format of the input time.
@@ -202,25 +230,6 @@ def verify_symbol(user_input: str, symbols_name: list[str]) -> str | None:
             print("<NOTICE> Input part of the symbols you are looking for. For example, if you look for symbols with \"EUR\", just type in \"EUR\".")
     
     return None
-
-def make_file(FILENAME: str, HDF5_PATH: Path):
-    """
-    Description: 
-        Create/initialize the HDF5 file of interest
-
-    Args:
-        FILENAME (str): Name of the HDF5 file we will create.
-        HDF5_PATH (Path): Absolute path (as a Path object) of the HDF5 file (that we will create).
-    """
-    with h5py.File(HDF5_PATH, mode = "w") as hdf5_file:
-        print(f"\n<NOTICE> File created:")
-        print(f"File name: {FILENAME}")
-        print(f"File location: {HDF5_PATH}")
-        
-        print(f"\n<NOTICE> The file has been created successfully.")
-        
-    change_log(FILENAME, HDF5_PATH, log_mode = "create")
-    print(f"<LOG {FILENAME}> Log group initialized.")
 
 def get_input(FILENAME: str) -> dict:
     """_summary_

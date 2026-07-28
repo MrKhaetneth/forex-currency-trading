@@ -37,7 +37,7 @@ def check_status():
 
 # -------- SYSTEM CALLING ----------
 if __name__ != "__main__":
-    print(f"Importing {__file__}...")
+    print(f"<IMPORT> Importing {__file__}...")
 
 else:
     print("Why are you running this file?")
