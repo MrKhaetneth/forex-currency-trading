@@ -4,17 +4,13 @@ import pandas as pd
 import numpy as np
 import h5py
 import pytz
-import sys
 
 from datetime import datetime
 from pathlib import Path
 
-import utility_func as uf
+from .utility_func import get_input, change_log
 
-parent_dir = Path(__file__).resolve().parent.parent
-sys.path.append(str(parent_dir))
-from check_env import check_status
-del parent_dir
+from .check_env import check_status
 
 # -------- CONSTANTS ----------
 
@@ -146,7 +142,7 @@ def save_dataset(hdf5_path: Path, symbol: str, mt5_timeframe: int, df: pd.DataFr
     if is_new_file:
         with h5py.File(hdf5_path, "w") as f:  # only truncates because the file doesn't exist yet
             pass
-        uf.change_log(hdf5_path.name, hdf5_path, log_mode="create")
+        change_log(hdf5_path.name, hdf5_path, log_mode="create")
 
     with h5py.File(hdf5_path, "a") as f:  # "a" never overwrites/truncates the whole file
         group = f.require_group(group_path)
@@ -176,7 +172,7 @@ def save_dataset(hdf5_path: Path, symbol: str, mt5_timeframe: int, df: pd.DataFr
         dset.attrs["n_rows"] = len(merged_arr)
 
     new_time = _time_to_datetime(df["time"])
-    uf.change_log(hdf5_path.name, hdf5_path, log_mode="append", log_description={
+    change_log(hdf5_path.name, hdf5_path, log_mode="append", log_description={
         "SYMBOL": symbol,
         "TIMEFRAME": timeframe_name,
         "TIME_START": new_time.min(),
@@ -229,7 +225,7 @@ def remove_dataset(hdf5_path: Path, symbol: str, mt5_timeframe: int) -> str:
         del f[dataset_path]
 
     print(f"<NOTICE> Removed dataset '{dataset_path}' from {hdf5_path}.")
-    uf.change_log(hdf5_path.name, hdf5_path, log_mode="remove", log_description={
+    change_log(hdf5_path.name, hdf5_path, log_mode="remove", log_description={
         "SYMBOL": symbol,
         "TIMEFRAME": timeframe_name,
     })

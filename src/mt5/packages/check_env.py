@@ -2,11 +2,10 @@
 import os 
 import MetaTrader5 as mt5
 
-from dotenv import load_dotenv
-from pathlib import Path
+from dotenv import load_dotenv, find_dotenv
 
 # -------- CONSTANTS ----------
-ENV_PATH = Path(__file__).resolve().parent.parent.parent / "keys.env"
+ENV_PATH = find_dotenv(filename="keys.env", raise_error_if_not_found=True)
 load_dotenv(dotenv_path = ENV_PATH)
 
 MT5_CRED = {"account": int(os.getenv("mt5_account")),

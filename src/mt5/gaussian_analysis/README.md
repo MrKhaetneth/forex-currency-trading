@@ -12,7 +12,7 @@ Run the normality comparison script using `uv` from the repository root director
 
 ```bash
 # Compare all normalization methods (Time, Volume, Dollar, Vol-Std Time, Vol-Std Volume)
-uv run mt5-api/Gaussian_Analysis/mt5-advanced-normalization.py
+uv run src/mt5/gaussian_analysis/mt5_advanced_normalization.py
 ```
 
 ---
@@ -25,7 +25,21 @@ Raw exchange rates (closing prices $P_t$) are non-stationary—they trend, drift
 In quantitative finance, we use **log returns** instead of simple percentage returns:
 $$R_t = \ln\left(\frac{P_t}{P_{t-1}}\right)$$
 
-* **Mathematical Property**: Log returns are time-additive. Summing the log returns of five consecutive minutes yields the exact log return of the entire 5-minute block.
+* **Mathematical Property:** Log returns are time-additive. Summing the log returns of five consecutive minutes yields the exact log return of the entire 5-minute block. Consider a set of $n$ closing prices, $C=\{P_0,P_1,\cdots,P_n\}$, with each closing price being $\Delta T$ apart in time. So, the entire set $C$ spans over $n\Delta T$ in time. If $P_t = P_{t-1}$ then $R_t = 0$; $P_t < P_{t-1}$ then $R_t < 0$; $P_t > P_{t-1}$ then $R_t > 0$. 
+
+  But you might wonder why it's not $R_t = P_t - P_{t-1}$ or the **simple return** $R(t) = P_t/P_{t-1} - 1$. Well, if $R_t = P_t - P_{t-1}$, sure it might satisfy the *time-additive* property: $P_t - P_{t-2} = R_t + R_{t-1}$. But then it would be just price difference, if the difference in price is very minute or very large, the quantity $P_t - P_{t-1}$ wouldn't exactly capture the sheer difference between $P_t$ and $P_{t-1}$. 
+
+  As for the simple return, consider the case where $(P_0,P_1,P_2) = (100, 110, 99)$. There are three simple returns we can define from this $P_0,P_1,$ and $P_2$. Over a single time interval, we have 
+
+  $$ R(P_0,P_1) = \frac{P_1}{P_0} - 1 = 10\% ,\quad R(P_2,P_1) = \frac{P_2}{P_1} - 1 = -10\%,\quad\text{and}\quad R(P_2,P_0) = \frac{P_2}{P_0} - 1 = -1\% $$
+
+  But this is not time-additive: $-1\% = R(P_2,P_0) \neq R(P_2,P_1) + R(P_1, P_0) = 10\% - 10\% = 0\%$. Thus, we chose $R_t = \ln(P_t/P_{t-1})$ because it encapsulates the difference in scale between $P_t$ and $P_{t-1}$ comprehensibly and it's time-additive. The mathematical form isn't too intimidating too. In general, we also have that 
+
+  $$ \ln \frac{P_n}{P_0} = \sum_{t=1}^{n\Delta T} R_t $$
+
+  Also, if $1 + r(t) = P_t/P_{t-1}$, where $r(t)$ is the simple return, then we may approximate $R_t = \ln(1 + r(t)) \simeq r(t)$ for a small enough $r(t)$.
+
+
 * **Code Implementation**:
   ```python
   df['Time_Log_Returns'] = np.log(df['close'] / df['close'].shift(1))

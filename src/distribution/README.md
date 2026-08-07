@@ -1,6 +1,6 @@
 # Volume-Based Microstructure Analysis: Time Bars vs. Volume Bars
 
-This folder contains [fx_try.py](file:forex-currency-trading/distribution/fx_try.py), a script that demonstrates the statistical benefits of **Volume Bars** over standard **Time Bars** for modeling asset returns.
+This folder contains [fx_try.py](file:forex-currency-trading/src/distribution/fx_try.py), a script that demonstrates the statistical benefits of **Volume Bars** over standard **Time Bars** for modeling asset returns.
 
 ## Background & Rationale
 
@@ -29,7 +29,7 @@ In actual financial markets, returns exhibit **heavy/fat tails (leptokurtosis)**
 * In the real world, these "Black Swan" events occur regularly. Assuming a Gaussian distribution severely **underestimates tail risk**, which has historically led to massive hedge fund collapses (such as LTCM in 1998).
 
 ### 3. Why Quant Traders Strive for Gaussian returns
-If Gaussian models are so unrealistic, why does [fx_try.py](file:///home/rithkung/undergrad/fx_analysis/forex-currency-trading/distribution/fx_try.py) attempt to restore normality using **Volume Bars**?
+If Gaussian models are so unrealistic, why does [fx_try.py](file:forex-currency-trading/src/distribution/fx_try.py) attempt to restore normality using **Volume Bars**?
 Many of the most powerful and widely used tools in quantitative finance are mathematically predicated on normal distributions:
 * **Black-Scholes Option Pricing**: Assumes log-normal price paths.
 * **Modern Portfolio Theory (Markowitz)**: Uses mean and variance to optimize portfolios (which breaks down if returns are highly asymmetric or heavy-tailed).
@@ -42,7 +42,7 @@ By changing our sampling clock from chronological "time" to transactional "volum
 
 ## Methodology & Pipeline
 
-The pipeline implemented in [fx_try.py](forex-currency-trading/distribution/fx_try.py) follows these key steps:
+The pipeline implemented in [fx_try.py](forex-currency-trading/src/distribution/fx_try.py) follows these key steps:
 
 ### 1. Data Ingestion
 - **Asset Selection**: Downloads 1-minute historical data for `SPY` (S&P 500 ETF) over a `5d` (5 days) period via `yfinance`. 
@@ -91,9 +91,9 @@ Alternatively, ensure the following Python packages are installed:
 
 Navigate to the project root directory and execute:
 ```bash
-uv run python distribution/fx_try.py
+uv run python src/distribution/fx_try.py
 ```
-Or directly within the `distribution` directory:
+Or directly within the `src/distribution` directory:
 ```bash
 python fx_try.py
 ```

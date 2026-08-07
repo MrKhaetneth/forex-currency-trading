@@ -9,10 +9,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-parent_dir = Path(__file__).resolve().parent.parent
-sys.path.append(str(parent_dir))
-from check_env import check_status
-del parent_dir
+from .check_env import check_status
 
 # -------- CONSTANTS ----------
 TIMEZONE = pytz.timezone("Etc/UTC")
@@ -319,7 +316,7 @@ def mt5_download_rates(SYMBOL: str, MT5_TIMEFRAME, HDF5_TIMEFRAME: str, TIME_STA
 
 # -------- SYSTEM CALLING ----------
 if __name__ != "__main__":
-    print(f"Importing {__file__}...")
+    print(f"<IMPORT> Importing {__file__}...")
 
 else:
     print("Why are you running this file?")
