@@ -3,7 +3,7 @@ from pathlib import Path
 
 import MetaTrader5 as mt5
 
-from ..packages.data_storage_func import load_dataset
+from mt5.packages.data_storage_func import load_dataset
 
 # -------- CONSTANTS ----------
 
