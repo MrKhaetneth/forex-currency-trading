@@ -4,12 +4,11 @@ import pandas as pd
 import subprocess
 import pytz
 import csv
-import sys
 
 from datetime import datetime
 from pathlib import Path
 
-from .check_env import check_status
+from project_packages.check_env import check_status
 
 # -------- CONSTANTS ----------
 TIMEZONE = pytz.timezone("Etc/UTC")
@@ -58,6 +57,7 @@ def _append_log_row(HDF5_PATH: Path, row: list):
         if is_new_file:
             csv_writer.writerow(_LOG_COLUMNS)
         csv_writer.writerow(row)
+
 
 def change_log(FILENAME: str, HDF5_PATH: Path, log_mode: str, log_description: dict = {}):
     """Record an entry into the CSV change log kept alongside the HDF5 file (see log_csv_path).
@@ -108,6 +108,7 @@ def change_log(FILENAME: str, HDF5_PATH: Path, log_mode: str, log_description: d
 
         case _:
             raise ValueError(f"<ERROR> Unrecognized log_mode: '{log_mode}'.")
+        
 
 def parse_datetime(time_input: str) -> datetime:
     """Check the format of the input time.

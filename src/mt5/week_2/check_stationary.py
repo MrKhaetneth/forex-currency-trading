@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 
 from project_packages.data_storage_func import load_dataset
-from scipy.stats import kurtosis
+from statsmodels.tsa.stattools import adfuller
 
 # -------- CONSTANTS ----------
 
@@ -28,14 +28,27 @@ def main():
     sample_ohlcv["log_return"] = np.log( sample_ohlcv["close"] / sample_ohlcv["close"].shift(1) )
     df = sample_ohlcv.dropna()
     
-    log_return = df["log_return"].to_numpy()
+    log_return = df["log_return"]
     
-    sns.set_style("darkgrid")
-    print(f"<NOTICE> Kurtosis (Fisher definition: normal dist = 0.0): {kurtosis(log_return, fisher = True)}.")
-    sns.histplot(log_return, kde = True)
+    # Perform ADF test 
+    result = adfuller(log_return)
+    print("ADF Statistic:", result[0])
+    print("p-value:", result[1])
+    print("Critical Values:")
+    for key, value in result[4].items():
+        print(f"   {key}: {value}")
+    
+    # Plotting
+    sns.set(style = "whitegrid")
+    plt.figure(figsize = (12, 6))
+    sns.lineplot(data = df, x = df["time"], y = "log_return", label = "EURUSD", color = "blue")
+    
+    plt.xlabel("Date")
+    plt.ylabel("Log Return (Closing Price)")
+    plt.title("Log Return of the Closing Price Evolution over Time")
+    
     plt.show()
     
-
 # -------- SYSTEM CALLING ----------
 if __name__ == "__main__":
     main()

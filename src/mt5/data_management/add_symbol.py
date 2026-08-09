@@ -7,9 +7,9 @@ import pytz
 
 from pathlib import Path 
 
-from ..packages.data_storage_func import download_ohlcv, save_dataset, load_dataset
-from ..packages.utility_func import get_input
-from ..packages.check_env import check_status
+from project_packages.data_storage_func import download_ohlcv, save_dataset, load_dataset
+from project_packages.utility_func import get_input
+from project_packages.check_env import check_status
 
 # -------- CONSTANTS ----------
 
@@ -42,7 +42,7 @@ def main():
     TIME_START = user_spec["TIME_START"]
     TIME_END = user_spec["TIME_END"]
     
-    # -------- DOWNLOAD SAMPLE DATA ----------
+    # -------- DOWNLOAD DATA ----------
     df = download_ohlcv(SYMBOL, MT5_TIMEFRAME, TIME_START, TIME_END)
     print(df.head())
 
