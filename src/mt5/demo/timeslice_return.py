@@ -1,7 +1,11 @@
 # -------- IMPORTS ----------
 from pathlib import Path 
 
+import matplotlib.pyplot as plt
 import MetaTrader5 as mt5
+import seaborn as sns
+import pandas as pd
+import numpy as np
 
 from mt5.packages.data_storage_func import load_dataset
 
@@ -20,7 +24,13 @@ MT5_TIMEFRAME = mt5.TIMEFRAME_D1
 # -------- MAIN ----------
 def main():
     sample_ohlcv = load_dataset(HDF5_PATH, SYMBOL, MT5_TIMEFRAME)
-    print(sample_ohlcv)
+    sample_ohlcv["log_return"] = np.log( sample_ohlcv["close"] / sample_ohlcv["close"].shift(1) )
+    df = sample_ohlcv.dropna()
+    
+    sns.set_style("darkgrid")
+    sns.histplot(df["log_return"], kde = True)
+    plt.show()
+    
 
 # -------- SYSTEM CALLING ----------
 if __name__ == "__main__":
