@@ -1,22 +1,15 @@
 # -------- IMPORTS ----------
-import utility_func as uf
+import sys
 
 import MetaTrader5 as mt5
 import pandas as pd
-import numpy as np
-import h5py
 import pytz
-import sys
 
-from datetime import datetime
 from pathlib import Path 
-import data_storage_func as dsf
-import utility_func as uf
 
-parent_dir = Path(__file__).resolve().parent.parent 
-sys.path.append(str(parent_dir))
-from check_env import check_status
-del parent_dir 
+from project_packages.data_storage_func import download_ohlcv, save_dataset, load_dataset
+from project_packages.utility_func import get_input
+from project_packages.check_env import check_status
 
 # -------- CONSTANTS ----------
 
@@ -43,22 +36,22 @@ def main():
         quit()
     
     # Get user input
-    user_spec = uf.get_input(FILENAME)
+    user_spec = get_input(FILENAME)
     SYMBOL = user_spec["SYMBOL"]
     MT5_TIMEFRAME = user_spec["MT5_TIMEFRAME"]
     TIME_START = user_spec["TIME_START"]
     TIME_END = user_spec["TIME_END"]
     
-    # -------- DOWNLOAD SAMPLE DATA ----------
-    df = dsf.download_ohlcv(SYMBOL, MT5_TIMEFRAME, TIME_START, TIME_END)
+    # -------- DOWNLOAD DATA ----------
+    df = download_ohlcv(SYMBOL, MT5_TIMEFRAME, TIME_START, TIME_END)
     print(df.head())
 
     # -------- SAVE / MERGE INTO HDF5 ----------
-    dataset_path = dsf.save_dataset(HDF5_PATH, SYMBOL, MT5_TIMEFRAME, df)
+    dataset_path = save_dataset(HDF5_PATH, SYMBOL, MT5_TIMEFRAME, df)
     print(f"\n<NOTICE> Data saved at '{dataset_path}' inside {HDF5_PATH}.")
 
     # -------- VERIFY ----------
-    reloaded = dsf.load_dataset(HDF5_PATH, SYMBOL, MT5_TIMEFRAME)
+    reloaded = load_dataset(HDF5_PATH, SYMBOL, MT5_TIMEFRAME)
     print(f"<NOTICE> Reloaded {len(reloaded)} rows from '{dataset_path}'.")
     print(f"<CHECK> Rows are chronologically ascending: {pd.Series(reloaded['time']).is_monotonic_increasing}")
 
