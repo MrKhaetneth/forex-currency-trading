@@ -6,7 +6,7 @@
 
 # Databases
 *.h5
-*.csv 
+*.csv
 
 # Testing environments
 testing_area/
