@@ -8,7 +8,7 @@ import csv
 from datetime import datetime
 from pathlib import Path
 
-from project_packages.check_env import check_status
+from old_packages.check_env import check_status
 
 # -------- CONSTANTS ----------
 TIMEZONE = pytz.timezone("Etc/UTC")

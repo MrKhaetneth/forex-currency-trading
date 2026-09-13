@@ -8,9 +8,9 @@ import pytz
 from datetime import datetime
 from pathlib import Path
 
-from project_packages.utility_func import get_input, change_log
+from old_packages.utility_func import get_input, change_log
 
-from project_packages.check_env import check_status
+from old_packages.check_env import check_status
 
 # -------- CONSTANTS ----------
 

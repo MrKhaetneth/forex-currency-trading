@@ -7,6 +7,9 @@
 # Databases
 *.h5
 *.csv
+*.json
+*.jsonl
+*.db
 
 # Testing environments
 testing_area/

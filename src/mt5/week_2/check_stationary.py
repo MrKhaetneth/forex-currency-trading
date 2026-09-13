@@ -7,7 +7,7 @@ import seaborn as sns
 import pandas as pd
 import numpy as np
 
-from project_packages.data_storage_func import load_dataset
+from old_packages.data_storage_func import load_dataset
 from statsmodels.tsa.stattools import adfuller
 
 # -------- CONSTANTS ----------

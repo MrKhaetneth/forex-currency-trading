@@ -7,9 +7,9 @@ import pytz
 
 from pathlib import Path 
 
-from project_packages.data_storage_func import download_ohlcv, save_dataset, load_dataset
-from project_packages.utility_func import get_input
-from project_packages.check_env import check_status
+from old_packages.data_storage_func import download_ohlcv, save_dataset, load_dataset
+from old_packages.utility_func import get_input
+from old_packages.check_env import check_status
 
 # -------- CONSTANTS ----------
 
