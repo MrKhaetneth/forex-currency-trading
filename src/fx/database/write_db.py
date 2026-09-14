@@ -12,7 +12,6 @@ import pytz
 import sqlite3
 
 from datetime import datetime
-from pathlib import Path
 
 from fx.connection import mt5_connected
 from fx.database.read_db import get_table_names, get_table_content
@@ -111,9 +110,9 @@ def _merge_chronologically(existing_table: pd.DataFrame, new_table: pd.DataFrame
 
 
 def add_table(db_connection: sqlite3.Connection,
+              cursor:sqlite3.Cursor,
               table_name: str,
-              input_table: pd.DataFrame,
-              cursor:sqlite3.Cursor) -> None:
+              input_table: pd.DataFrame) -> None:
     # Table doesn't exist. Directly insert input_table.
     if not _table_exists(cursor, table_name):
         input_table.to_sql(table_name, db_connection, index = False)
@@ -128,14 +127,13 @@ def add_table(db_connection: sqlite3.Connection,
 # -------- MAIN ----------
 def main():
     if not mt5_connected():
-        print("<NOTICE> Can't connect to MetaTrader5.")
         sys.exit(1)
     
     # If database (.db file) doesn't exist, it creates a new one automatically.
     with sqlite3.connect(_DB_PATH) as db_connection:
         cursor = db_connection.cursor()
         new_table = get_ohlcv(_SYMBOL, "D1", _TIMESTART, _TIMEEND, 20000)
-        add_table(db_connection, _SYMBOL, new_table, cursor)
+        add_table(db_connection, cursor, _SYMBOL, new_table)
         
         print(get_table_names(cursor))
         print(get_table_content(db_connection, _SYMBOL))

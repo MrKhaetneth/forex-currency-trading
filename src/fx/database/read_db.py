@@ -39,7 +39,15 @@ def get_column_names(cursor: sqlite3.Cursor, table_name: str) -> list[str]:
 
 
 def get_table_content(db_connection: sqlite3.Connection, table_name: str) -> pd.DataFrame:
-    return pd.read_sql(f"SELECT * FROM {table_name}", db_connection)
+    df = pd.read_sql(f"SELECT * FROM {table_name}", db_connection, parse_dates=["time"])
+    
+    # Force dtype to ensure compatability with MetaTrader5 API pulled OHLCV table
+    df["time"] = df["time"].astype("datetime64[s]")
+    df["tick_volume"] = df["tick_volume"].astype("uint64")
+    df["spread"] = df["spread"].astype("int32")
+    df["real_volume"] = df["real_volume"].astype("uint64")
+    
+    return df 
 
 # -------- SYSTEM CALLING ----------
 if __name__ == "__main__":

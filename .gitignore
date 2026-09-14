@@ -11,8 +11,14 @@
 *.jsonl
 *.db
 
+# -- This file is for testing
+!tests/data/test.db
+
 # Testing environments
 testing_area/
 
 # caches
 **/__pycache__/
+
+# Initialization files
+tests/data/dbinit.py
